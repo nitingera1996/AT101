@@ -4,7 +4,7 @@ import pandas as pd
 from binance.client import Client
 
 # Account init
-TEST_MODE = False
+TEST_MODE = True
 
 env_variable_prefix = "demo" if TEST_MODE else "prod"
 
