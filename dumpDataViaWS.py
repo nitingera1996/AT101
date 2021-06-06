@@ -15,7 +15,7 @@ DEFAULT_COIN_SYMBOL = 'BTCUSDT'
 TZ = 'Asia/Kolkata'
 TIME_FMT = '%m/%d/%Y %H:%M'
 DUMP_PATH = 'data/dumps/'
-DUMP_FREQ = {'minutes': 1}      # Only hours and minutes supported
+DUMP_FREQ = {'hours': 1}      # Only hours and minutes supported
 
 # Account init
 env_variable_prefix = "demo" if TEST_MODE else "prod"
@@ -27,7 +27,8 @@ if TEST_MODE:
 
 # Global Variables
 socket_response = {'kline': None, 'error': False}
-header_row = ['Duration', 'EpochDate', 'LocalTime', 'Open', 'High', 'Low', 'PriceChange', 'PriceChange%', 'LastPrice', 'LastQuantity', 'BestBidPrice', 'BestBidQuantity', 'BestAskPrice', 'BestAskQuantity', 'NumberOfTrades', 'Volume']
+#header_row = ['Duration', 'EpochDate', 'LocalTime', 'Open', 'High', 'Low', 'PriceChange', 'PriceChange%', 'LastPrice', 'LastQuantity', 'BestBidPrice', 'BestBidQuantity', 'BestAskPrice', 'BestAskQuantity', 'NumberOfTrades', 'Volume']
+header_row = ['EpochDate', 'LocalTime', 'Open', 'Close', 'High', 'Low', 'Base Volume', 'Quote Volume', 'Kline Closed?']
 script_start_time = datetime.now(timezone(TZ))
 print("Script start time is -", script_start_time.strftime(TIME_FMT))
 
@@ -43,7 +44,8 @@ def dump_to_csv(filename, klines):
 def socket_response_handler(msg):
     """ Define how to process incoming WebSocket messages """
     if msg['e'] != 'error':
-        socket_response['kline'] = [msg['e'], msg['E'], datetime.fromtimestamp(int(msg['E'])/1000.0).strftime('%c'), msg['o'], msg['h'], msg['l'], msg['p'], msg['P'], msg['c'], msg['Q'], msg['b'], msg['B'], msg['a'], msg['A'], msg['n'], msg['v']]
+        #socket_response['kline'] = [msg['e'], msg['E'], datetime.fromtimestamp(int(msg['E'])/1000.0).strftime('%c'), msg['o'], msg['h'], msg['l'], msg['p'], msg['P'], msg['c'], msg['Q'], msg['b'], msg['B'], msg['a'], msg['A'], msg['n'], msg['v']]
+        socket_response['kline'] = [msg['E'], datetime.fromtimestamp(int(msg['E'])/1000.0).strftime('%c'), msg['k']['o'], msg['k']['c'], msg['k']['h'], msg['k']['l'], msg['k']['v'], msg['k']['q'], msg['k']['x']]
     else:
         socket_response['error'] = True
 
@@ -58,7 +60,8 @@ def dump_coin_data(coin_symbol):
 
     # Start Websocket
     bsm = BinanceSocketManager(client)
-    conn_key = bsm.start_symbol_ticker_socket(coin_symbol, socket_response_handler)
+    #conn_key = bsm.start_symbol_ticker_socket(coin_symbol, socket_response_handler)
+    conn_key = bsm.start_kline_socket(coin_symbol, socket_response_handler )
     bsm.start()
     print(f"Started Websocket for getting ticker for symbol {coin_symbol}")
 
@@ -80,7 +83,7 @@ def dump_coin_data(coin_symbol):
 
         current_time = datetime.now(timezone(TZ))
         if current_time.strftime(TIME_FMT) == next_dump_time.strftime(TIME_FMT):
-            filename = DUMP_PATH + coin_symbol + '/' + next_dump_time.strftime("%Y%m%d-%H:%M") + ".csv"
+            filename = DUMP_PATH + coin_symbol + '/' + next_dump_time.strftime("%Y%m%d-%H%M") + ".csv"
             dump_to_csv(filename, klines)
             klines = []
             next_dump_time = next_dump_time + timedelta(**DUMP_FREQ)
