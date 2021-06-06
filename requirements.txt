@@ -4,3 +4,7 @@ requests==2.25.1
 urllib3==1.26.4
 webencodings==0.5.1
 websockets==9.0.2
+yaml~=0.2.5
+pyyaml~=5.4.1
+pytz~=2021.1
+twisted~=21.2.0

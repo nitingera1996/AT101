@@ -1,0 +1,11 @@
+# These options apply to how the script will operate.
+script_options:
+  # TODO: Integrate with code
+  TEST_MODE: True
+
+
+# These options apply to the trading methods the script executes
+trading_options:
+
+  SIGNALLING_MODULES:
+    - external.twitter_streams

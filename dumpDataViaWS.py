@@ -95,7 +95,6 @@ def dump_coin_data(coin_symbol):
     reactor.stop()
 
 
-
 def parse_args():
     x = argparse.ArgumentParser()
     x.add_argument('--coin', '-c', help="Coin to Parse")
