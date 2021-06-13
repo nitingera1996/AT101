@@ -2,4 +2,5 @@
 .idea/
 data/
 external/signals
+signals/
 *.pyc

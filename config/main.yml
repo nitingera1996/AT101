@@ -9,3 +9,4 @@ trading_options:
 
   SIGNALLING_MODULES:
     - external.twitter_streams
+    - external.fear_and_greed_index
