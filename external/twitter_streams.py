@@ -3,6 +3,7 @@ import os
 import json
 import dateutil.parser
 from utils.dump_utils import dump_signal
+from helpers.sentiment_analysis import analyze_sentiment
 
 TWITTER_SIGNAL_NAME = "TWITTER"
 
@@ -105,13 +106,18 @@ def listen_to_stream(headers):
 
 
 def check_and_dump_signal(full_tweet, tag):
-    # TODO : Do sentiment analysis of tweets, Find Coin in text.
+    # TODO : Find Coin in text.
     # Can add strategies as per tags here
     print(f'Tag: {tag}')
     if tag == "elon" or tag == "devo":
         # Dump everything without checking much for now
         full_tweet_data = full_tweet["data"][0]
-        dump_signal(TWITTER_SIGNAL_NAME, dateutil.parser.isoparse(full_tweet_data["created_at"]), full_tweet_data["id"])
+        tweet_text = full_tweet_data["text"]
+        tweet_lang = full_tweet_data["lang"]
+        if tweet_lang == "en" and any(map(tweet_text.lower().__contains__, CRYPTO_WORDS)):
+            polarity = analyze_sentiment(tweet_text)
+            dump_signal(TWITTER_SIGNAL_NAME, dateutil.parser.isoparse(full_tweet_data["created_at"]),
+                        full_tweet_data["id"], sentiment=polarity)
     elif tag == "major_news" or tag == "tier_2":
         # Dump everything without checking much for now
         full_tweet_data = full_tweet["data"][0]
